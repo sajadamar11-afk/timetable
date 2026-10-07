@@ -46,6 +46,7 @@ table.g{border-collapse:collapse;width:100%;font-size:11px;text-align:center}
 }
 .dlg{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}.dlg>div{background:var(--c);color:var(--t);border-radius:14px;padding:20px;max-width:340px;width:100%;text-align:center}.dlg p{margin:0 0 12px}
 .ld{font-size:12px;color:var(--m)}.ld.bad{color:var(--x);font-weight:700}.pbk{margin-bottom:14px}@media print{.pbk{break-after:page}.pbk:last-child{break-after:auto}}
+.stg th.gt{background:#f2d57e;color:#3b2f00;font-size:15px;padding:8px}.stg th.dy{writing-mode:vertical-rl;min-width:34px;font-size:14px}.stg td{height:30px;min-width:64px;font-size:11px}.stg td.no{background:#a9cdf0;min-width:22px;font-weight:700}.stg tr.dtop td,.stg tr.dtop th.dy{border-top:4px solid #e0b84a}
 </style></head><body>
 <header><h1>منظّم جدول الحصص المدرسي</h1><p>توزيع آلي بلا تعارض · نقل وتبديل باللمس · طباعة · يعمل بدون إنترنت</p></header>
 <nav><button data-k="s" onclick="T('s')">الإعدادات</button><button data-k="t" onclick="T('t')">المعلمون</button><button data-k="b" onclick="T('b')">المواد</button><button data-k="c" onclick="T('c')">الشعب والنصاب</button><button data-k="g" onclick="T('g')">الجداول</button></nav>
@@ -90,7 +91,7 @@ function lds(id){dlg('استبدال الجدول الحالي بالمحفوظ�
 function dls(id){S.sv=S.sv.filter(x=>x.id!=id);save();R()}
 function demo(){bak=JSON.stringify(S);S=dflt();S.type='متوسطة';S.school='مدرسة تجريبية';S.ns=2;preset();S.T=['أحمد علي','حسن كاظم','علي جاسم','زينب محمد','سارة حسين','مصطفى ياسر','هدى كريم','عمر فاضل'].map(n=>({id:uid(),n,off:[],bp:[]}));S.Q.forEach(q=>q.t=S.T[(S.B.findIndex(b=>b.id==q.s)+(S.C.findIndex(c=>c.id==q.c)>>1))%8].id);G(1);T('g')}
 function exitDemo(){S=JSON.parse(bak);bak=null;R()}
-function selBar(){if(!sel||!['f','c','ac'].includes(vw.m))return'';const[c,d,p]=sel.split('|'),cl=S.C.find(x=>x.id==c),cnt={};S.tt[c].forEach(r=>r.forEach(x=>{if(x)cnt[x]=(cnt[x]||0)+1}));const qs=S.Q.filter(q=>q.c==c&&sub(q.s)).map(q=>({q,r:q.h-(cnt[q.id]||0)})).sort((a,b)=>(b.r>0)-(a.r>0));
+function selBar(){if(!sel||!['f','c','ac','dy','st','as'].includes(vw.m))return'';const[c,d,p]=sel.split('|'),cl=S.C.find(x=>x.id==c),cnt={};S.tt[c].forEach(r=>r.forEach(x=>{if(x)cnt[x]=(cnt[x]||0)+1}));const qs=S.Q.filter(q=>q.c==c&&sub(q.s)).map(q=>({q,r:q.h-(cnt[q.id]||0)})).sort((a,b)=>(b.r>0)-(a.r>0));
 return`<div class=it style="background:var(--bg);border-radius:8px;padding:8px"><b style="min-width:100%">${E(cl?cl.n:'')} — ${DN[+d]} — الحصة ${+p+1}</b><select id=pq class=grow>${qs.map(({q,r})=>`<option value="${q.id}">${E(sub(q.s).n)} — ${E(short(tch(q.t)?.n||'بلا'))} (${r>0?'متبقي '+r:'مكتمل'})</option>`).join('')}</select><select id=pn style="width:auto"><option value=1>خانة</option><option value=2>خانتين (محاضرة)</option><option value=3>3 خانات</option></select><button class=pb onclick=putq()>وضع</button><button class=sb onclick=clr()>مسح</button></div>`}
 function clr(){const[c,d,p]=sel.split('|');S.tt[c][+d][+p]=null;sel=null;save();R()}
 const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -106,6 +107,14 @@ for(let d=0;d<o.nd;d++){h+=`<tr><th>${DN[d]}</th>`;for(let p=0;p<o.np;p++){const
 $('nav').style.display='none';$('header p').textContent='جدولك الأسبوعي';
 $('#v').innerHTML=h+`</tbody></table></div><p class=m style="text-align:center">${o.c.length} حصة أسبوعياً · أيام التفريغ: ${E(o.off.map(i=>DN[i]).join('، ')||'—')}</p><button class="pb nop" onclick=print()>🖨️ طباعة</button></div>`;return true}
 function lnk(t){const d=document.createElement('div');d.className='dlg nop';d.innerHTML='<div><p>انسخ الرابط:</p><textarea id=lt readonly rows=6 style="width:100%;direction:ltr;font-size:12px"></textarea><button class=pb id=cp>نسخ</button> <button class=sb id=cl>إغلاق</button></div>';document.body.appendChild(d);const a=d.querySelector('#lt');a.value=t;const s=()=>{a.focus();a.select();try{a.setSelectionRange(0,t.length)}catch(e){}};s();d.querySelector('#cl').onclick=()=>d.remove();d.querySelector('#cp').onclick=()=>{s();let ok=false;try{ok=document.execCommand('copy')}catch(e){}d.querySelector('#cp').textContent=ok?'تم النسخ ✓':'المس النص مطولاً واختر نسخ'}}
+function dayT(d){const B=bad(),sh=S.dm?(S.ds[d]?1:0):0,tm=!S.dbl||S.dm;let h=`<h3 style="text-align:center">${DN[d]}${S.dm?' — '+(sh?'عصري':'صباحي'):''}</h3><table class=g><thead><tr><th>الشعبة</th>`+Array.from({length:S.np},(_,p)=>`<th>${p+1}${tm?`<br><small>${hm(slot(p,sh)[0])}</small>`:''}</th>`).join('')+'</tr></thead><tbody>';
+for(const c of S.C){h+=`<tr><th>${E(c.n)}${!S.dm&&c.sh?' 🌙':''}</th>`;for(let p=0;p<S.np;p++)h+=td(c.id,d,p,B);h+='</tr>'}return h+'</tbody></table>'}
+function stageT(st){const cs=S.C.filter(c=>c.st==st);if(!cs.length)return'';const B=bad();
+let h=`<table class="g stg"><thead><tr><th class=gt colspan=${1+cs.length*3}>جدول الحصص الأسبوعي — ${E(st)}</th></tr><tr><th></th>${cs.map(c=>`<th colspan=3>${E(c.n)}${!S.dm&&c.sh?' 🌙':''}</th>`).join('')}</tr></thead><tbody>`;
+for(let d=0;d<S.nd;d++)for(let p=0;p<S.np;p++){h+='<tr'+(p==0?' class=dtop':'')+'>';if(p==0)h+=`<th class=dy rowspan=${S.np}>${DN[d]}${S.dm?`<br><small>${S.ds[d]?'عصري':'صباحي'}</small>`:''}</th>`;
+for(const c of cs){const k=c.id+'|'+d+'|'+p,id=S.tt[c.id]?.[d]?.[p],q=qq(id),ok=q&&sub(q.s),cl=(B.has(k)?'x ':'')+(sel==k?'s':''),oc=`onclick="pick('${c.id}',${d},${p})"`;
+h+=`<td class="no ${cl}" ${oc}>${p+1}</td><td class="${cl}"${ok&&!B.has(k)?bg(id):''} ${oc}><b>${ok?E(sub(q.s).n):''}</b></td><td class="${cl}" ${oc}>${ok?E((tch(q.t)||{}).n||''):''}</td>`}
+h+='</tr>'}return h+'</tbody></table>'}
 function ssh(st,v){S.C.forEach(c=>{if(c.st==st)c.sh=v});save();R()}
 function csh(id,v){S.C.find(c=>c.id==id).sh=v;save();R()}
 function uq(id,k,v){qq(id)[k]=v;save();if(k=='h')R()}
@@ -117,7 +126,7 @@ const short=n=>String(n||'').trim().split(/\s+/).slice(0,2).join(' ');
 function dflt(){return{school:'',mgr:'',nd:5,np:7,paper:'A4',T:[],type:'',sv:[],th:0,dbl:false,dm:false,ds:[0,0,1,1,1,1,1],t1:'12:30',t0:'07:30',dur:45,gap:5,bell:false,mx:0,nc:false,logo:'',seal:'',br:'كلاهما',ns:1,sc:1,sa:1,B:[],C:[],Q:[],tt:{},miss:0,gen:false}}
 function load(){try{const x=localStorage.getItem('sched1');if(x)return Object.assign(dflt(),JSON.parse(x))}catch(e){}return dflt()}
 function save(){if(bak)return;try{localStorage.setItem('sched1',JSON.stringify(S))}catch(e){}}
-let S=load(),tab='s',sel=null,vw={m:'f',id:''},cq='',nm='',no=[],bnm='',bs=[],bhv=2,sg=[],sgv='',sgt='',bak=null;
+let S=load(),tab='s',sel=null,vw={m:'st',id:''},cq='',nm='',no=[],bnm='',bs=[],bhv=2,sg=[],sgv='',sgt='',bak=null;
 const sub=id=>S.B.find(x=>x.id==id),tch=id=>S.T.find(x=>x.id==id),qq=id=>S.Q.find(x=>x.id==id);
 const opts=(a,v,f)=>a.map(x=>`<option value="${x.id}"${x.id==v?' selected':''}>${E(f(x))}</option>`).join('');
 const tg=(a,v)=>a.includes(v)?a.filter(x=>x!=v):[...a,v];
@@ -196,7 +205,8 @@ for(const k in m){const a=k.split('|');if(m[k].length>1||(tch(a[0])&&(tch(a[0]).
 return r}
 function cell(id,tc){const q=qq(id);if(!q||!sub(q.s))return'';const n=sub(q.s).n;
 return`<b>${E(n)}</b><i>${E(tc||short(tch(q.t)?.n))}</i>`}
-const bg=id=>{const q=qq(id);return !S.nc&&q&&sub(q.s)?` style="background:hsl(${hue(sub(q.s).n)} 65% 87%)"`:''};
+const SC={'اللغة العربية':'#bcd9f0','اللغة الإنكليزية':'#a8d98a','الرياضيات':'#f4b99a','الفلسفة':'#5b7fb5','التاريخ':'#bdbdbd','الاقتصاد':'#f4b6c2','الجغرافية':'#ffff33','التربية الإسلامية':'#ece3c0','التربية الفنية':'#f3d1ec','العلوم':'#cfe8c6','الفيزياء':'#c9d7f2','الكيمياء':'#e6d3f2','الأحياء':'#bfe8d8','الحاسوب':'#d8f0f0','التربية الرياضية':'#ffd9a8','الاجتماعيات':'#e8e1b0'};
+const bg=id=>{const q=qq(id);if(S.nc||!q||!sub(q.s))return'';const n=sub(q.s).n,c=SC[n];return c?` style="background:${c}${n=='الفلسفة'?';color:#fff':''}"`:` style="background:hsl(${hue(n)} 65% 87%)"`};
 function td(c,d,p,B){const k=c+'|'+d+'|'+p,id=S.tt[c]?.[d]?.[p];return`<td class="${p==0?'ds ':''}${B.has(k)?'x ':''}${sel==k?'s':''}"${id&&!B.has(k)?bg(id):''} onclick="pick('${c}',${d},${p})">${id?cell(id):''}</td>`}
 function fullT(){const B=bad(),D=DN.slice(0,S.nd);let h='<table class=g><thead><tr><th rowspan=2>الشعبة</th>'+D.map((d,i)=>`<th colspan=${S.np} class="dh ds">${d}${S.dm?`<br><small>${S.ds[i]?'عصري':'صباحي'}</small>`:''}</th>`).join('')+'</tr><tr>';
 for(let d=0;d<S.nd;d++)for(let p=0;p<S.np;p++)h+=`<th class="${p==0?'ds':''}">${p+1}</th>`;h+='</tr></thead><tbody>';
@@ -215,12 +225,12 @@ return h+`</tbody></table><p class=m style="text-align:center">إجمالي حص
 function pick(c,d,p){const k=c+'|'+d+'|'+p;if(!sel){sel=k}else if(sel==k){sel=null}else{const[c0,d0,p0]=sel.split('|');
 if(c0==c){const t=S.tt[c];[t[d0][p0],t[d][p]]=[t[d][p],t[d0][p0]];sel=null;save()}else sel=k}R()}
 function rG(){const B=bad(),tot=S.Q.reduce((a,q)=>a+q.h,0);
-const pk=a=>a.map(x=>`<div class=pbk>${x}</div>`).join(''),body=vw.m=='f'?fullT():vw.m=='c'?clsT(vw.id):vw.m=='t'?tchT(vw.id):vw.m=='ac'?pk(S.C.map(c=>clsT(c.id))):vw.m=='at'?pk(S.T.map(t=>tchT(t.id))):tmT();
-const ms=[['f','الجدول الكامل'],['c','جدول شعبة'],['t','جدول '+WD()[0]],['ac','كل الشعب'],['at','كل '+WD()[1]],['tm','التواقيت']];
+const stg=[...new Set(S.C.map(c=>c.st))];if(vw.m=='st'&&!stg.includes(vw.id))vw.id=stg[0]||'';const pk=a=>a.map(x=>`<div class=pbk>${x}</div>`).join(''),body=vw.m=='st'?stageT(vw.id):vw.m=='as'?pk(stg.map(stageT)):vw.m=='dy'?pk(Array.from({length:S.nd},(_,d)=>dayT(d))):vw.m=='f'?fullT():vw.m=='c'?clsT(vw.id):vw.m=='t'?tchT(vw.id):vw.m=='ac'?pk(S.C.map(c=>clsT(c.id))):vw.m=='at'?pk(S.T.map(t=>tchT(t.id))):tmT();
+const ms=[['st','جدول المرحلة'],['as','كل المراحل'],['dy','جدول يومي'],['f','الجدول الكامل'],['c','جدول شعبة'],['t','جدول '+WD()[0]],['ac','كل الشعب'],['at','كل '+WD()[1]],['tm','التواقيت']];
 return`<div class="card nop"><button class=pb onclick=G()>⚡ ${S.gen?'إعادة التوليد':'توليد الجدول'}</button> <button class=sb onclick=prt()>🖨️ طباعة / PDF</button> <button class=sb onclick=xl()>📊 Excel</button>${S.miss?' <button class=sb onclick="G(1,800)">معالجة المتبقية</button>':''}
 <div class=stat><span>النصاب المطلوب ${tot} حصة</span>${S.gen?`<span class="${S.miss?'bad':'ok'}">${S.miss?'حصص لم تتوزع: '+S.miss:'اكتمل التوزيع'}</span><span class="${B.size?'bad':'ok'}">${B.size?'تعارضات: '+B.size+' خانة':'بلا تعارض'}</span>`:''}</div>
 <div class=chips>${ms.map(([k,l])=>`<b class="ch${vw.m==k?' on':''}" onclick="vw.m='${k}';vw.id='';sel=null;R()">${l}</b>`).join('')}</div>
-${vw.m=='c'?`<select onchange="vw.id=this.value;R()">${opts(S.C,vw.id,c=>c.n)}</select>`:''}${vw.m=='t'?`<select onchange="vw.id=this.value;R()">${opts(S.T,vw.id,t=>t.n)}</select>`:''}
+${vw.m=='st'?`<select onchange="vw.id=this.value;R()">${stg.map(s=>`<option${vw.id==s?' selected':''}>${E(s)}</option>`).join('')}</select>`:''}${vw.m=='c'?`<select onchange="vw.id=this.value;R()">${opts(S.C,vw.id,c=>c.n)}</select>`:''}${vw.m=='t'?`<select onchange="vw.id=this.value;R()">${opts(S.T,vw.id,t=>t.n)}</select>`:''}
 ${selBar()}${vw.m!='t'&&S.gen?'<p class=m>المس حصة ثم المس مكاناً آخر في نفس الشعبة للنقل أو التبديل. الخانات الحمراء = تعارض معلم أو يوم تفريغ.</p>':''}</div>
 ${S.gen?`<div class="card nop"><h3>الجداول المحفوظة</h3><div class=row><input id=sn2 placeholder="اسم الجدول"><button class=sb style="flex:none" onclick=svs()>💾 حفظ الحالي</button></div>${S.sv.map(v=>`<div class=it><b class=grow>${E(v.n)}</b><button class=sb onclick="lds('${v.id}')">فتح</button><button class=dl onclick="dls('${v.id}')">حذف</button></div>`).join('')}</div>`:''}<div id=pa><div class=ph>${S.logo?`<img src="${S.logo}" style="height:60px">`:''}<h2>${E(S.school||'الجدول الأسبوعي')}</h2><div>الجدول الأسبوعي للدروس</div></div>
 <div class=sc>${S.C.length?body:'<p class=m style="padding:12px">أضف الشعب والنصاب ثم ولّد الجدول.</p>'}</div><div class=pf>${S.seal?`<img src="${S.seal}" style="height:50px"> `:''}${S.mgr?'المدير: '+E(S.mgr):''}</div></div>`}
